@@ -52,6 +52,25 @@ npm run build
 npm run preview
 ```
 
+### 📱 打包 APK（GitHub Actions 自动构建）
+
+无需安装 Android Studio，代码推送后自动构建 APK：
+
+1. **推送代码到 GitHub**
+   ```bash
+   git push
+   ```
+
+2. **访问 Actions 页面**
+   - https://github.com/cxc460045989/project-idle/actions
+
+3. **下载 APK**
+   - 点击最新的构建记录
+   - 在 Artifacts 中下载 `app-debug-xxx.zip`
+   - 解压得到 APK 文件
+
+详细教程：[GitHub Actions 打包指南](./GITHUB_ACTIONS_APK.md)
+
 ---
 
 ## 🎯 游戏系统

@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ master ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建 Web 资源
+        run: npm run build
+
+      - name: 设置 Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 设置 Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 安装 Capacitor
+        run: npm install -D @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: 初始化 Capacitor
+        run: npx cap init "Idle Reincarnation" com.idle.reincarnation --web-dir=dist --skip-appid-validation
+
+      - name: 添加 Android 平台
+        run: npx cap add android
+
+      - name: 同步资源
+        run: npx cap sync android
+
+      - name: 构建 Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 上传 APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: 创建 Release (如果是标签推送)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
