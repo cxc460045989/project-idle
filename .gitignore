@@ -46,7 +46,7 @@ coverage
 *.temp
 Thumbs.db
 
-# Android 构建产物（不上传，由 GitHub Actions 构建）
+# Android 构建产物（不上传，本地打包）
 android/
 *.apk
 *.aab
