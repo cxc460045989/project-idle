@@ -19,13 +19,34 @@ jobs:
       - run: npm ci
       - run: npm run build
       
-      - name: Build APK with Capacitor
-        uses: capgo/action@v4
+      - name: Install Capacitor
+        run: npm install -D @capacitor/core @capacitor/cli @capacitor/android
+      
+      - name: Create capacitor.config.json
+        run: |
+          echo '{"appId":"com.idle.reincarnation","appName":"IdleReincarnation","webDir":"dist"}' > capacitor.config.json
+      
+      - name: Add Android
+        run: npx cap add android
+      
+      - name: Sync
+        run: npx cap sync android
+      
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
-          packagePath: '.'
-          artifactName: app-debug.apk
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon --no-parallel --no-configuration-cache
       
       - uses: actions/upload-artifact@v4
         with:
-          name: apk-${{ github.sha }}
-          path: app-debug.apk
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
