@@ -38,7 +38,10 @@ jobs:
         run: npm install -D @capacitor/core @capacitor/cli @capacitor/android
 
       - name: 初始化 Capacitor
-        run: npx cap init "Idle Reincarnation" com.idle.reincarnation --web-dir=dist --skip-appid-validation
+        run: |
+          npx cap init "IdleReincarnation" com.idle.reincarnation --web-dir=dist << EOF
+          y
+          EOF
 
       - name: 添加 Android 平台
         run: npx cap add android
