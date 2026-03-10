@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-electron
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 存档文件（玩家存档，建议不上传）
+*.save
+
+# 数据库文件（IndexedDB 导出文件）
+*.db
+*.sqlite
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 构建输出
+build
+coverage
+*.tsbuildinfo
+
+# 临时文件
+*.tmp
+*.temp
+Thumbs.db
+
