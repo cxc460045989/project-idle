@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
     steps:
       - name: 检查代码
         uses: actions/checkout@v4
@@ -18,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
 
       - name: 安装依赖
         run: npm ci
@@ -25,7 +27,7 @@ jobs:
       - name: 构建 Web 资源
         run: npm run build
 
-      - name: 设置 Java
+      - name: 设置 Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
@@ -35,28 +37,21 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: 安装 Capacitor
-        run: npm install -D @capacitor/core @capacitor/cli @capacitor/android
+        run: |
+          npm install -D @capacitor/core @capacitor/cli @capacitor/android
 
       - name: 初始化 Capacitor
         run: |
-          npx cap init "IdleReincarnation" com.idle.reincarnation --web-dir=dist << EOF
-          y
-          EOF
-
-      - name: 添加 Android 平台
-        run: npx cap add android
+          echo '{"appId":"com.idle.reincarnation","appName":"Idle Reincarnation","webDir":"dist","bundledWebRuntime":false}' > capacitor.config.json
+          npx cap add android
 
       - name: 同步资源
         run: npx cap sync android
 
-      - name: 清理 Gradle 缓存
-        run: rm -rf android/.gradle
-
       - name: 构建 Debug APK
         run: |
           cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --no-build-cache
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
@@ -64,11 +59,3 @@ jobs:
           name: app-debug-${{ github.sha }}
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-
-      - name: 创建 Release (如果是标签推送)
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
